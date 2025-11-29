@@ -3,7 +3,7 @@ import sys
 from getpass import getpass
 from app.neo4j_client import Neo4jClient
 from app.services import auth_service, user_service, graph_service, search_service
-from app.utils.validators import is_valid_username, is_valid_email
+from app.utils.validators import is_valid_username, is_valid_email, is_strong_password
 
 def pause():
     input("\n[Enter] to continue...")
@@ -27,9 +27,17 @@ def edit_profile(client: Neo4jClient, username: str):
     name = input("New name (leave blank to keep): ").strip() or None
     email = input("New email (leave blank to keep): ").strip() or None
     bio = input("New bio (leave blank to keep): ").strip() or None
+    if email is not None and not is_valid_email(email):
+        print("Invalid email format; keeping existing email.")
+        email = None
     try:
         updated = user_service.update_profile(client, username, name=name, bio=bio, email=email)
-        print("Updated:", updated)
+        if not updated:
+            print("Update failed: profile not found.")
+        else:
+            print("Profile updated successfully:")
+            for k, v in updated.items():
+                print(f"  {k}: {v}")
     except Exception as e:
         print("Update failed:", e)
 
@@ -50,24 +58,34 @@ def login_menu(client: Neo4jClient):
             if not is_valid_email(email):
                 print("Invalid email."); pause(); continue
             password = getpass("Password: ")
+            if not is_strong_password(password):
+                print("Weak password. Use at least 8 characters with letters and digits."); pause(); continue
+            password2 = getpass("Confirm password: ")
+            if password != password2:
+                print("Passwords do not match."); pause(); continue
             bio = input("Bio (optional): ").strip()
             try:
                 u = auth_service.register_user(client, username, name, email, password, bio)
-                print("Registered:", u)
+                print("Registered successfully:")
+                for k, v in u.items():
+                    if k not in ("passwordHash", "salt"):
+                        print(f"  {k}: {v}")
+            except ValueError as e:
+                print(f"Registration failed: {e}")
             except Exception as e:
-                print("Registration failed:", e)
+                print("Registration failed due to an unexpected error:", e)
             pause()
         elif choice == "2":
             print_header("UC-2 User Login")
             username = input("Username: ").strip()
             password = getpass("Password: ")
-            prof = auth_service.login_user(client, username, password)
+            prof, err = auth_service.login_user(client, username, password)
             if prof:
                 print(f"Login OK. Welcome, {prof['name']}!")
                 pause()
                 home_menu(client, username)
             else:
-                print("Login failed.")
+                print(f"Login failed. {err}")
                 pause()
         elif choice == "0":
             print("Bye."); sys.exit(0)

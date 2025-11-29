@@ -51,9 +51,11 @@ def login_user(client: Neo4jClient, username: str, password: str) -> Optional[Di
         {"username": username}
     )
     if not recs:
-        return None
+        return None, "User not found"
     row = recs[0]
     if row["passwordHash"] is None:
-        return None
+        return None, "This account does not have a password set."
     ok = verify_password(password, row["passwordHash"], row["salt"] or "")
-    return row["profile"] if ok else None
+    if not ok:
+        return None, "Incorrect password."
+    return row["profile"], None
