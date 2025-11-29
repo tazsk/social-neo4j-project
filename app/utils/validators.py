@@ -9,3 +9,15 @@ def is_valid_email(e: str) -> bool:
 
 def is_nonempty(s: str) -> bool:
     return bool(s and s.strip())
+
+def is_strong_password(p: str) -> bool:
+    """
+    At least 8 chars, must contain a letter and a digit.
+    """
+    if len(p) < 8:
+        return False
+    if not re.search(r"[A-Za-z]", p):
+        return False
+    if not re.search(r"\d", p):
+        return False
+    return True
