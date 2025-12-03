@@ -4,8 +4,6 @@ from typing import List, Dict, Any
 from app.neo4j_client import Neo4jClient
 from app.utils.validators import is_valid_username
 
-_MAX_LIMIT = 100
-
 def follow_user(client: Neo4jClient, src_username: str, dst_username: str) -> bool:
     # UC-5: Follow Another User
     if not (is_valid_username(src_username) and is_valid_username(dst_username)):
