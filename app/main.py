@@ -114,7 +114,7 @@ def home_menu(client: Neo4jClient, me: str):
             print_header("UC-5 Follow Another User")
             who = input("Username to follow: ").strip()
             ok = graph_service.follow_user(client, me, who)
-            print("Followed." if ok else "Cannot follow yourself.")
+            print("Followed." if ok else "Follow failed. Ensure the user exists and isn't you.")
             pause()
         elif choice == "6":
             print_header("UC-6 Unfollow a User")
