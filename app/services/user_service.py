@@ -3,6 +3,7 @@ from typing import Dict, Any, Optional, List
 from app.neo4j_client import Neo4jClient
 
 def get_profile(client: Neo4jClient, username: str) -> Optional[Dict[str, Any]]:
+    # UC-3: View Profile
     recs = client.read("""
         MATCH (u:User {username: $username})
         RETURN u { .username, .name, .email, .bio, createdAt: toString(u.createdAt), updatedAt: toString(u.updatedAt) } AS user
@@ -10,6 +11,7 @@ def get_profile(client: Neo4jClient, username: str) -> Optional[Dict[str, Any]]:
     return recs[0]["user"] if recs else None
 
 def update_profile(client: Neo4jClient, username: str, name: Optional[str] = None, bio: Optional[str] = None, email: Optional[str] = None) -> Optional[Dict[str, Any]]:
+    # UC-4: Edit Profile
     recs = client.write("""
         MATCH (u:User {username: $username})
         SET u.name = coalesce($name, u.name),

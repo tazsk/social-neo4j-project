@@ -3,6 +3,7 @@ from typing import List, Dict, Any
 from app.neo4j_client import Neo4jClient
 
 def search_users(client: Neo4jClient, q: str, limit: int = 25) -> List[Dict[str, Any]]:
+    # UC-10: Search Users
     # use fulltext index if available
     try:
         return client.read("""
@@ -22,6 +23,7 @@ def search_users(client: Neo4jClient, q: str, limit: int = 25) -> List[Dict[str,
         """, {"q": q, "limit": limit})
 
 def popular_users(client: Neo4jClient, limit: int = 10) -> List[Dict[str, Any]]:
+    # UC-11: Explore Popular Users
     return client.read("""
         MATCH (u:User)
         OPTIONAL MATCH (u)<-[:FOLLOWS]-(:User)

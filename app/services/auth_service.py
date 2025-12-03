@@ -20,6 +20,7 @@ def create_schema(client: Neo4jClient) -> None:
     """)
 
 def register_user(client: Neo4jClient, username: str, name: str, email: str, password: str, bio: str = "") -> Dict[str, Any]:
+    # UC-1: User Registration
     pw_hash, salt = hash_password(password)
     try:
         recs = client.write(
@@ -43,6 +44,7 @@ def register_user(client: Neo4jClient, username: str, name: str, email: str, pas
         raise ValueError("Username or email already exists") from e
 
 def login_user(client: Neo4jClient, username: str, password: str) -> Optional[Dict[str, Any]]:
+    # UC-2: User Login
     recs = client.read(
         """
         MATCH (u:User {username: $username})
