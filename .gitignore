@@ -17,3 +17,7 @@ venv/
 # Large datasets
 *.gz
 *.zip
+node_modules
+
+.DS_Store
+*.pem
